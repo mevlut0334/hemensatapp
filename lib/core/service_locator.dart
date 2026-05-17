@@ -16,6 +16,7 @@ import 'package:hemensatapp/data/repositories/offer_repository.dart';
 import 'package:hemensatapp/logic/offer/offer_bloc.dart';
 import 'package:hemensatapp/logic/sale_listing/sale_listings_list_bloc.dart';
 import 'package:hemensatapp/logic/repair_listing/my_repair_listings_bloc.dart';
+import 'package:hemensatapp/core/services/fcm_service.dart';
 
 final sl = GetIt.instance;
 
@@ -111,7 +112,8 @@ sl.registerFactory<SaleListingsListBloc>(
       repairListingRepository: sl<RepairListingRepository>(),
     ),
   );
-
+// FCM Service
+  sl.registerSingleton<FcmService>(FcmService(sl<ApiClient>()));
   // Offer BLoC
   sl.registerFactory<OfferBloc>(
     () => OfferBloc(

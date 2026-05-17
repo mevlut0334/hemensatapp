@@ -16,10 +16,17 @@ import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'core/theme/app_colors.dart';
 import 'package:hemensatapp/presentation/screens/my_listings/my_sale_listings_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'core/services/fcm_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await setupLocator();
+  await sl<FcmService>().initialize();
 
   runApp(const MyApp());
 }
