@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hemensatapp/logic/repair_listing/create_repair_listing_bloc.dart';
 import 'package:hemensatapp/logic/repair_listing/repair_listings_list_bloc.dart';
@@ -22,6 +23,21 @@ import 'core/services/fcm_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Edge-to-edge ekran desteği (Android 15+ uyarısını çözer)
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // Status bar ve navigation bar şeffaf yap, ikonlar koyu tema için
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -51,37 +67,33 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => MultiBlocProvider(
-            // ← BU KISMI EKLEYİN
-            providers: [
-              BlocProvider(
-                create: (context) =>
-                    sl<RepairListingsListBloc>()
-                      ..add(const LoadRepairListings()),
+                providers: [
+                  BlocProvider(
+                    create: (context) =>
+                        sl<RepairListingsListBloc>()
+                          ..add(const LoadRepairListings()),
+                  ),
+                ],
+                child: const HomeScreen(),
               ),
-            ],
-            child: const HomeScreen(),
-          ),
           '/create-sale-listing': (context) => BlocProvider(
-            create: (context) => sl<CreateSaleListingBloc>(),
-            child: const CreateSaleListingScreen(),
-          ),
+                create: (context) => sl<CreateSaleListingBloc>(),
+                child: const CreateSaleListingScreen(),
+              ),
           '/create-repair-listing': (context) => BlocProvider(
-            create: (context) => sl<CreateRepairListingBloc>(),
-            child: const CreateRepairListingScreen(),
-          ),
+                create: (context) => sl<CreateRepairListingBloc>(),
+                child: const CreateRepairListingScreen(),
+              ),
           '/my-sale-listings': (context) => const MySaleListingsScreen(),
         },
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            // Loading durumunda da splash göster
             if (state is AuthInitial || state is AuthLoading) {
               return const SplashScreen();
             }
 
-            // Eğer kullanıcı zaten giriş yapmışsa HomeScreen'e yönlendir
             if (state is AuthAuthenticated) {
               return MultiBlocProvider(
-                // ← BlocProvider yerine MultiBlocProvider
                 providers: [
                   BlocProvider(
                     create: (context) =>
@@ -93,12 +105,10 @@ class MyApp extends StatelessWidget {
               );
             }
 
-            // Giriş yapılmamışsa SplashScreen göster
             if (state is AuthUnauthenticated) {
               return const SplashScreen();
             }
 
-            // Varsayılan olarak SplashScreen
             return const SplashScreen();
           },
         ),
